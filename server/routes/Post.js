@@ -1,119 +1,99 @@
 const express = require("express");
 const router = express.Router();
 const Post = require("../models/PostModel");
-const slugify = require('slugify')
+const slugify = require("slugify");
+const asyncHandler = require("../utils/asyncHandler");
+const validatePostCreate = require("../middlewear/postValidationCreate");
+const validatePostUpdate = require("../middlewear/postValidationUpdate");
 
-// Get all posts
-router.get("/", async (req, res) => {
-  console.log("get post routes");
-  try {
-    const posts = await Post.find();
-    res.json(posts);
-  } catch (error) {
-    res.status(500).json({ message: err.message });
+// GET all posts
+router.get("/", asyncHandler(async (req, res) => {
+  const posts = await Post.find();
+  res.json(posts);
+}));
+
+// GET post by ID
+router.get("/:id", asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404);
+    throw new Error("Post not found");
   }
-});
+  res.json(post);
+}));
 
-// Find a specific post by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const post = await Post.findById(id);
-    console.log(post);
+// CREATE a post
+router.post("/",validatePostCreate,asyncHandler(async (req, res) => {
+  const { title, author, content, excerpt, tags, isPublished, slug } = req.body;
 
-    if (!post) {
-      return res.status(404).json({
-        message: "Post not found",
-      });
-    }
-    res.json(post);
-  } catch (error) {
-    res.status(500).json({
-      message: err.message,
-    });
+  if (!title || !author || !content) {
+    res.status(400);
+    throw new Error("title, author, content are required.");
   }
-});
 
-// Create a post
-router.post("/", async (req, res) => {
-  try {
-    const { title, author, content, excerpt, tags, isPublished } = req.body;
+  const postSlug = slug || slugify(title, { lower: true, strict: true });
 
-    if (!title || !author || !content) {
-      return res
-        .status(400)
-        .json({ message: "title, author, content are required." });
+  const newPost = new Post({
+    title,
+    author,
+    content,
+    excerpt,
+    tags,
+    isPublished,
+    slug: postSlug,
+  });
+
+  const savedPost = await newPost.save();
+  res.status(201).json(savedPost);
+}));
+
+// UPDATE a post
+router.put("/:id", validatePostUpdate, asyncHandler(async (req, res) => {
+  // Only pick the fields that exist in req.body
+  const updateData = {};
+
+  const allowedFields = ["title", "author", "content", "excerpt", "slug", "tags", "isPublished"];
+  allowedFields.forEach(field => {
+    if (req.body[field] !== undefined) {
+      updateData[field] = req.body[field];
     }
+  });
 
-    const newPost = new Post({
-      title,
-      author,
-      content,
-      excerpt,
-      tags,
-      isPublished,
-    });
 
-    const savedPost = await newPost.save();
-
-    res.status(201).json(savedPost);
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(400).json({ message: "Slug must be unique." });
-    }
-    res.status(500).json({ message: error.message });
+  if (!updateData.slug && updateData.title) {
+    updateData.slug = slugify(updateData.title, { lower: true, strict: true });
   }
-});
-// Update the post 
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, author, content, excerpt, slug, tags, isPublished } =
-      req.body;
 
-   
-    let updatedSlug =
-      slug ||
-      (title ? slugify(title, { lower: true, strict: true }) : undefined);
+  const updatedPost = await Post.findByIdAndUpdate(
+    req.params.id,
+    updateData,
+    { new: true, runValidators: true }
+  );
 
-    // Perform the update
-    const updatedPost = await Post.findByIdAndUpdate(
-      id,
-      {
-        title,
-        author,
-        content,
-        excerpt,
-        slug: updatedSlug,
-        tags,
-        isPublished,
-      },
-      { new: true, runValidators: true }
-    );
-
-    // If post not found
-    if (!updatedPost) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    // Return updated post
-    res.status(200).json({
-      message: "Post updated successfully",
-      post: updatedPost,
-    });
-  } catch (error) {
-     if (error.name === 'CastError') {
-      return res.status(400).json({ message: 'Invalid post ID' });
-    }
-
-    // Handle duplicate slug errors
-    if (error.code === 11000) {
-      return res.status(400).json({ message: 'Slug must be unique.' });
-    }
-
-    // General server error
-    res.status(500).json({ message: error.message });
+  if (!updatedPost) {
+    res.status(404);
+    throw new Error("Post not found");
   }
-});
+
+  res.json({
+    message: "Post updated successfully",
+    post: updatedPost,
+  });
+}));
+
+// DELETE a post
+router.delete("/:id", asyncHandler(async (req, res) => {
+  const deletedPost = await Post.findByIdAndDelete(req.params.id);
+
+  if (!deletedPost) {
+    res.status(404);
+    throw new Error("Post not found");
+  }
+
+  res.json({
+    message: "Post deleted successfully",
+    deletedPost,
+  });
+}));
 
 module.exports = router;

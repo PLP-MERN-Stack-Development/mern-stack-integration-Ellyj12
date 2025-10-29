@@ -6,26 +6,24 @@ const slugify = require('slugify');
 const PostSchema = new mongoose.Schema(
     {
         title:{
-            required:true,
             type : String,
-            maxlength:[20,'Title can not be more than 20 characters']
         },
         author:{
-            required:[true,'Author cannot be empty'],
+          
             type : String
         },
-        // category:{
-        //     type: mongoose.Schema.Types.ObjectId,
-        //     ref: 'Category',
-        //     required: true,
-        // },
+        category:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Category',
+            required: true,
+        },
         content:{
-            required:[true,'Please provide content'],
+           
             type : String
         },
         excerpt:{
             type: String ,
-            maxlength:[100,'Excerpt cant be more than 100 characters']
+           
         },
         slug:{
             required:true,

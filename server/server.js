@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
-
+const errorHandler = require('./middlewear/errorHandler')
 
 // Environment Configuration
 
@@ -38,6 +38,7 @@ const postsRoutes = require('./routes/Post');
 
 // Use routes
 app.use('/api/posts', postsRoutes);
+app.use(errorHandler);
 
 // Base Route
 app.get('/', (req, res) => {
