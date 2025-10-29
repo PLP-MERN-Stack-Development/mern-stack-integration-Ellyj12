@@ -35,14 +35,16 @@ if (process.env.NODE_ENV === 'development') {
 // Route Imports
 
 const postsRoutes = require('./routes/Post');
+const categoryRoutes = require('./routes/Categories')
 
 // Use routes
 app.use('/api/posts', postsRoutes);
+app.use('/api/categories',categoryRoutes)
 app.use(errorHandler);
 
 // Base Route
 app.get('/', (req, res) => {
-  res.send('📰 MERN Blog API is running');
+  res.send('MERN Blog API is running');
 });
 
 
@@ -51,12 +53,12 @@ app.get('/', (req, res) => {
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
     app.listen(PORT, () => {
-      console.log(`⚡ Server running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error('❌ Failed to connect to MongoDB:', err.message);
+    console.error('Failed to connect to MongoDB:', err.message);
     process.exit(1);
   });
