@@ -1,5 +1,6 @@
 // Post.js - Mongoose model for blog posts
 
+const { Router } = require('express');
 const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema(
@@ -67,18 +68,17 @@ const PostSchema = new mongoose.Schema(
 );
 
 // Create slug from title before saving
-PostSchema.pre('save', function (next) {
-  if (!this.isModified('title')) {
-    return next();
+// ✅ Always generate slug if missing
+PostSchema.pre('validate', function (next) {
+  if (!this.slug && this.title) {
+    this.slug = this.title
+      .toLowerCase()
+      .replace(/[^\w ]+/g, '')
+      .replace(/ +/g, '-');
   }
-  
-  this.slug = this.title
-    .toLowerCase()
-    .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-');
-    
   next();
 });
+
 
 // Virtual for post URL
 PostSchema.virtual('url').get(function () {
@@ -98,3 +98,4 @@ PostSchema.methods.incrementViewCount = function () {
 };
 
 module.exports = mongoose.model('Post', PostSchema); 
+
