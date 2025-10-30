@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps: true } // auto creates createdAt and updatedAt
+  { timestamps: true }
 );
 
 module.exports = mongoose.model('Category', categorySchema);

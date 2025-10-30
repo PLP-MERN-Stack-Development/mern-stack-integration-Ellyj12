@@ -20,7 +20,10 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware Setup
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173' // frontend origin
+}));
+
 
 // Log requests in development mode
 if (process.env.NODE_ENV === 'development') {
@@ -36,10 +39,12 @@ if (process.env.NODE_ENV === 'development') {
 
 const postsRoutes = require('./routes/Post');
 const categoryRoutes = require('./routes/Categories')
+const authRoutes = require('./routes/auth')
 
 // Use routes
 app.use('/api/posts', postsRoutes);
 app.use('/api/categories',categoryRoutes)
+app.use('/api/auth', authRoutes);
 app.use(errorHandler);
 
 // Base Route

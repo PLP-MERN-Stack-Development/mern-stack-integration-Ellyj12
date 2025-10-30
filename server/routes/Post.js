@@ -6,6 +6,7 @@ const slugify = require("slugify");
 const asyncHandler = require("../utils/asyncHandler");
 const validatePostCreate = require("../middlewear/postValidationCreate");
 const validatePostUpdate = require("../middlewear/postValidationUpdate");
+const { protect, authorize } = require('../middlewear/auth');
 
 // GET all posts
 router.get(
@@ -32,7 +33,7 @@ router.get(
 // CREATE a post
 router.post(
   "/",
-  validatePostCreate,
+  protect,authorize('user','admin'),validatePostCreate,
   asyncHandler(async (req, res) => {
     const { title, author, content, excerpt, tags, isPublished, slug,category } =
       req.body;
@@ -69,7 +70,7 @@ router.post(
 // UPDATE a post
 router.put(
   "/:id",
-  validatePostUpdate,
+  protect,authorize('admin'),validatePostUpdate,
   asyncHandler(async (req, res) => {
  
     const updateData = {};
@@ -134,7 +135,7 @@ router.put(
 
 // DELETE a post
 router.delete(
-  "/:id",
+  "/:id",protect,authorize('user','admin'),
   asyncHandler(async (req, res) => {
     const deletedPost = await Post.findByIdAndDelete(req.params.id);
 
