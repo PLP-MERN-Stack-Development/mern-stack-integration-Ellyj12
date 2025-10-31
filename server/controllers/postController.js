@@ -3,14 +3,27 @@ const Category = require("../models/categoryModel");
 const slugify = require("slugify");
 const asyncHandler = require("../utils/asyncHandler");
 
+// GET all posts with pagination, search & category filter
 const getAllPosts = asyncHandler(async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
   const skip = (page - 1) * limit;
 
-  const totalPosts = await Post.countDocuments();
+  const query = {};
 
-  const posts = await Post.find()
+  // Search by title (case-insensitive)
+  if (req.query.search) {
+    query.title = { $regex: req.query.search, $options: "i" };
+  }
+
+  // Filter by category (category id)
+  if (req.query.category) {
+    query.category = req.query.category;
+  }
+
+  const totalPosts = await Post.countDocuments(query);
+
+  const posts = await Post.find(query)
     .populate("category", "name")
     .sort({ createdAt: -1 })
     .skip(skip)
@@ -26,6 +39,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
   });
 });
 
+// GET single post by ID
 const getPostById = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id).populate("category", "name");
 
@@ -37,6 +51,7 @@ const getPostById = asyncHandler(async (req, res) => {
   res.json(post);
 });
 
+// CREATE post
 const createPost = asyncHandler(async (req, res) => {
   const user = req.user; 
   if (!user) {
@@ -51,40 +66,35 @@ const createPost = asyncHandler(async (req, res) => {
     throw new Error("Please provide title and content");
   }
 
-  // ✅ Validate category by ID
   const categoryDoc = await Category.findById(category);
   if (!categoryDoc) {
     res.status(400);
     throw new Error("Invalid category");
   }
 
-  // ✅ Final slug
   const finalSlug = slug
     ? slugify(slug, { lower: true, strict: true })
     : slugify(title, { lower: true, strict: true });
 
   const post = new Post({
     title,
-    author: user.username, 
+    author: user.username,
     content,
     excerpt,
-    tags: tags ? tags.split(",") : [],
+    tags: tags ? (Array.isArray(tags) ? tags : tags.split(",").map(t => t.trim())) : [],
     isPublished: isPublished ?? true,
     slug: finalSlug,
     category: categoryDoc._id,
-    featuredImage: req.file ? req.file.filename: undefined, 
+    featuredImage: req.file ? req.file.filename : undefined,
   });
 
   const createdPost = await post.save();
-
-  const populatedPost = await Post.findById(createdPost._id).populate(
-    "category",
-    "name"
-  );
+  const populatedPost = await Post.findById(createdPost._id).populate("category", "name");
 
   res.status(201).json(populatedPost);
 });
 
+// UPDATE post
 const updatePost = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -108,14 +118,14 @@ const updatePost = asyncHandler(async (req, res) => {
   post.tags = tags ? (Array.isArray(tags) ? tags : tags.split(",").map(t => t.trim())) : post.tags;
   post.isPublished = isPublished !== undefined ? isPublished : post.isPublished;
 
-  // Slug
+  // Update slug
   if (slug) {
     post.slug = slugify(slug, { lower: true, strict: true });
   } else if (title) {
     post.slug = slugify(title, { lower: true, strict: true });
   }
 
-  // Category by ID
+  // Update category if provided
   if (category) {
     const categoryDoc = await Category.findById(category);
     if (!categoryDoc) {
@@ -125,20 +135,16 @@ const updatePost = asyncHandler(async (req, res) => {
     post.category = categoryDoc._id;
   }
 
- 
+  // Update author (optional)
   post.author = user.username;
 
-  
+  // Update featured image
   if (req.file) {
-    post.featuredImage = req.file.filename; 
+    post.featuredImage = req.file.filename;
   }
 
   const updatedPost = await post.save();
-
-  const populatedPost = await Post.findById(updatedPost._id).populate(
-    "category",
-    "name"
-  );
+  const populatedPost = await Post.findById(updatedPost._id).populate("category", "name");
 
   res.json({
     message: "Post updated successfully",
@@ -146,7 +152,7 @@ const updatePost = asyncHandler(async (req, res) => {
   });
 });
 
-
+// DELETE post
 const deletePost = asyncHandler(async (req, res) => {
   const deletedPost = await Post.findByIdAndDelete(req.params.id);
 
