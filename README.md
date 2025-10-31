@@ -94,7 +94,7 @@ For API details and examples, please consult the code under `server/routes/` and
 - `Client/` — React + Vite front-end
 - `server/` — Express back-end, routes, controllers, models
 - `uploads/` — stored uploads served by the server
-- `Week4-Assignment.md` — assignment instructions and checklist
+
 
 ## Development tips
 
