@@ -6,11 +6,6 @@ const validatePostUpdate = [
     .isLength({ max: 20 })
     .withMessage("Title cannot exceed 20 characters"),
 
-  body("author")
-    .optional()
-    .isLength({ max: 20 })
-    .withMessage("Author cannot exceed 20 characters"),
-
   body("content")
     .optional()
     .isLength({ min: 50, max: 200 })
@@ -22,10 +17,16 @@ const validatePostUpdate = [
     .withMessage("Excerpt cannot exceed 100 characters"),
   body("category")
     .optional()
-    .isIn(["Technology", "Lifestyle", "Education", "Health", "Travel"])
+    .isMongoId()
     .withMessage("Category must be one of the allowed values"),
 
-  body("tags").optional().isArray().withMessage("Tags must be an array"),
+body("tags")
+    .optional()
+    .custom((value) => {
+      if (typeof value === "string") return true; 
+      if (Array.isArray(value)) return true; 
+      throw new Error("Tags must be a comma-separated string or array");
+    }),
 
   body("isPublished")
     .optional()

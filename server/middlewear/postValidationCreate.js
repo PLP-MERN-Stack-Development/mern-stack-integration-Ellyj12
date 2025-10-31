@@ -7,12 +7,6 @@ const validatePostCreate = [
     .isLength({ max: 20 })
     .withMessage("Title cannot exceed 20 characters"),
 
-  body("author")
-    .notEmpty()
-    .withMessage("Author is required")
-    .isLength({ max: 20 })
-    .withMessage("Author cannot exceed 20 characters"),
-
   body("content")
     .notEmpty()
     .withMessage("Content is required")
@@ -24,7 +18,13 @@ const validatePostCreate = [
     .isLength({ max: 100 })
     .withMessage("Excerpt cannot exceed 100 characters"),
 
-  body("tags").optional().isArray().withMessage("Tags must be an array"),
+  body("tags")
+    .optional()
+    .custom((value) => {
+      if (typeof value === "string") return true; 
+      if (Array.isArray(value)) return true;
+      throw new Error("Tags must be a comma-separated string or array");
+    }),
 
   body("isPublished")
     .optional()
@@ -34,7 +34,7 @@ const validatePostCreate = [
   body("category")
     .notEmpty()
     .withMessage("Category is required")
-    .isIn(["Technology", "Lifestyle", "Education", "Health", "Travel"])
+    .isMongoId()
     .withMessage("Category must be one of the allowed values"),
 
   (req, res, next) => {

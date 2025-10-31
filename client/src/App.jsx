@@ -5,9 +5,11 @@ import HomePage from "./pages/homePage";
 import { useState } from "react";
 import PostsPage from "./pages/postsPage";
 import SinglePost from "./pages/singlePost";
+import EditPostPage from "./pages/editPage";
+import PostCreationPage from "./pages/postCreation";
 
 
-const Layout = () => {
+const Layout = ({user}) => {
 
 
   const [isOpen ,setIsOpen] = useState(false)
@@ -26,6 +28,8 @@ const Layout = () => {
         <Route path="/Home" element={<HomePage/>}/>
         <Route path="/Posts" element={<PostsPage/>}/>
         <Route path="/post/:id" element={<SinglePost />} />
+        <Route path="/edit-post/:id" element={<EditPostPage  user={user}/>} />
+        <Route path="/create" element={<PostCreationPage/>} />
       </Routes>
     </>
   );

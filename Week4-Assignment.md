@@ -14,22 +14,22 @@ Build a full-stack MERN (MongoDB, Express.js, React.js, Node.js) application tha
 
 ### Task 2: Back-End Development✅
 - Design and implement a RESTful API for a blog application with the following endpoints:
-  - `GET /api/posts`: Get all blog posts
-  - `GET /api/posts/:id`: Get a specific blog post
-  - `POST /api/posts`: Create a new blog post
-  - `PUT /api/posts/:id`: Update an existing blog post
-  - `DELETE /api/posts/:id`: Delete a blog post
-  - `GET /api/categories`: Get all categories
-  - `POST /api/categories`: Create a new category;
-- Create Mongoose models for `Post` and `Category` with proper relationships
-- Implement input validation using a library like Joi or express-validator
-- Add error handling middleware for API routes
+  - `GET /api/posts`: Get all blog posts✅
+  - `GET /api/posts/:id`: Get a specific blog post✅
+  - `POST /api/posts`: Create a new blog post✅
+  - `PUT /api/posts/:id`: Update an existing blog post✅
+  - `DELETE /api/posts/:id`: Delete a blog post✅
+  - `GET /api/categories`: Get all categories✅
+  - `POST /api/categories`: Create a new category;✅
+- Create Mongoose models for `Post` and `Category` with proper relationships✅
+- Implement input validation using a library like Joi or express-validator✅
+- Add error handling middleware for API routes✅
 
 ### Task 3: Front-End Development
 - Create React components for:
-  - Post list view
-  - Single post view
-  - Create/edit post form
+  - Post list view✅
+  - Single post view✅
+  - Create/edit post form✅
   - Navigation and layout✅✅
 - Implement React Router for navigation between different views
 - Use React hooks for state management (useState, useEffect, useContext)
