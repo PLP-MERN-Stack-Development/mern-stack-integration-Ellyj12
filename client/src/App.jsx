@@ -1,21 +1,42 @@
-
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/navbar";
+import LoginPage from "./pages/loginPage";
 import HomePage from "./pages/homePage";
+import { useState } from "react";
+import PostsPage from "./pages/postsPage";
+import SinglePost from "./pages/singlePost";
 
-function App() {
 
+const Layout = () => {
+
+
+  const [isOpen ,setIsOpen] = useState(false)
+  const toggleNav = ()=>{
+    setIsOpen(prev=>!prev)
+  }
+  const location = useLocation();
+  const hideNavbarOn = ["/"]; 
 
   return (
-    <Router>
-      <Navbar/>
+    <>
+      {!hideNavbarOn.includes(location.pathname) && <Navbar isOpen={isOpen} toggleNav={toggleNav} />}
+
       <Routes>
-        <Route path="/" element={<HomePage/>} />
+        <Route path="/" element={<LoginPage/>} />
+        <Route path="/Home" element={<HomePage/>}/>
+        <Route path="/Posts" element={<PostsPage/>}/>
+        <Route path="/post/:id" element={<SinglePost />} />
       </Routes>
+    </>
+  );
+};
+
+function App() {
+  return (
+    <Router>
+      <Layout />
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -45,6 +45,7 @@ const authRoutes = require('./routes/auth')
 app.use('/api/posts', postsRoutes);
 app.use('/api/categories',categoryRoutes)
 app.use('/api/auth', authRoutes);
+app.use("/uploads", express.static("uploads"));
 app.use(errorHandler);
 
 // Base Route
