@@ -1,78 +1,103 @@
-# MERN Stack Integration Assignment
+## MERN Blog — MERN Stack Integration Assignment
 
-This assignment focuses on building a full-stack MERN (MongoDB, Express.js, React.js, Node.js) application that demonstrates seamless integration between front-end and back-end components.
 
-## Assignment Overview
 
-You will build a blog application with the following features:
-1. RESTful API with Express.js and MongoDB
-2. React front-end with component architecture
-3. Full CRUD functionality for blog posts
-4. User authentication and authorization
-5. Advanced features like image uploads and comments
+A practical MERN (MongoDB, Express, React, Node) blog application used for  demonstrating full-stack integration. The project contains a React + Vite front-end (in `Client/`) and an Express + MongoDB back-end (in `server/`).
 
-## Project Structure
+## Why this project is useful
+
+- Demonstrates a full-stack workflow: separate client and server codebases with a REST API.
+- Covers common features needed in production apps: authentication (JWT), file uploads, CRUD operations, and middleware patterns.
+- Good starter code for learning or extending into a portfolio project.
+
+## Key features
+
+- RESTful API with Express and Mongoose
+- User registration and login (JWT-based)
+- Create/Read/Update/Delete blog posts
+- Image uploads served from `/uploads`
+- Client built with React + Vite (dev server runs on port 5173)
+
+## Tech stack
+
+- Node.js + Express
+- MongoDB + Mongoose
+- React + Vite
+- JSON Web Tokens for auth
+- multer for file uploads
+
+## Quick start (developer)
+
+Prerequisites
+
+- Node.js and npm (or yarn)
+- MongoDB (local or Atlas)
+
+1) Clone and install dependencies
+
+```powershell
+# from repository root
+npm install
+
+# install client deps
+cd Client; npm install; cd ..
+```
+
+2) Environment variables
+
+Create a `.env` file for the server. The server expects environment variables (its config loads `server/config/.env` via `dotenv`). Example values:
 
 ```
-mern-blog/
-├── client/                 # React front-end
-│   ├── public/             # Static files
-│   ├── src/                # React source code
-│   │   ├── components/     # Reusable components
-│   │   ├── pages/          # Page components
-│   │   ├── hooks/          # Custom React hooks
-│   │   ├── services/       # API services
-│   │   ├── context/        # React context providers
-│   │   └── App.jsx         # Main application component
-│   └── package.json        # Client dependencies
-├── server/                 # Express.js back-end
-│   ├── config/             # Configuration files
-│   ├── controllers/        # Route controllers
-│   ├── models/             # Mongoose models
-│   ├── routes/             # API routes
-│   ├── middleware/         # Custom middleware
-│   ├── utils/              # Utility functions
-│   ├── server.js           # Main server file
-│   └── package.json        # Server dependencies
-└── README.md               # Project documentation
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster0.example.mongodb.net/mydb
+JWT_SECRET=change_this_to_a_secure_random_string
+PORT=5000
+NODE_ENV=development
 ```
 
-## Getting Started
+Save this under `server/config/.env` or set the variables in your shell.
 
-1. Accept the GitHub Classroom assignment invitation
-2. Clone your personal repository that was created by GitHub Classroom
-3. Follow the setup instructions in the `Week4-Assignment.md` file
-4. Complete the tasks outlined in the assignment
+3) Run the server
 
-## Files Included
+```powershell
+# from repository root
+# start server directly
+node server/server.js
 
-- `Week4-Assignment.md`: Detailed assignment instructions
-- Starter code for both client and server:
-  - Basic project structure
-  - Configuration files
-  - Sample models and components
+# or with nodemon (installed in the repo dependencies)
+npx nodemon server/server.js
+```
 
-## Requirements
+By default the server listens on `PORT` (default 5000). The server file sets CORS origin to `http://localhost:5173` (the Vite dev server).
 
-- Node.js (v18 or higher)
-- MongoDB (local installation or Atlas account)
-- npm or yarn
-- Git
+4) Run the client (development)
 
-## Submission
+```powershell
+cd Client
+npm run dev
+```
 
-Your work will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+Vite will serve the front-end at `http://localhost:5173` by default.
 
-1. Complete both the client and server portions of the application
-2. Implement all required API endpoints
-3. Create the necessary React components and hooks
-4. Document your API and setup process in the README.md
-5. Include screenshots of your working application
+## Environment & configuration notes
 
-## Resources
+- Server entry: `server/server.js` (connects to `process.env.MONGODB_URI`, uses `process.env.JWT_SECRET`, default port 5000)
+- API base routes:
+  - `POST /api/auth/register` — register new user
+  - `POST /api/auth/login` — obtain JWT
+  - `GET|POST|PUT|DELETE /api/posts` — CRUD for posts
+  - `GET /api/categories` — categories
 
-- [MongoDB Documentation](https://docs.mongodb.com/)
-- [Express.js Documentation](https://expressjs.com/)
-- [React Documentation](https://react.dev/)
-- [Node.js Documentation](https://nodejs.org/en/docs/)
-- [Mongoose Documentation](https://mongoosejs.com/docs/) 
+For API details and examples, please consult the code under `server/routes/` and the React client in `Client/src/`.
+
+## Project layout (key folders)
+
+- `Client/` — React + Vite front-end
+- `server/` — Express back-end, routes, controllers, models
+- `uploads/` — stored uploads served by the server
+- `Week4-Assignment.md` — assignment instructions and checklist
+
+## Development tips
+
+- Use your MongoDB Atlas connection string for `MONGODB_URI` during development.
+- The client expects the API to be available at `http://localhost:5000` (unless you change the server `PORT`). Update client API base URLs in `Client/src/hooks/api.jsx` or wherever requests are made if needed.
+
